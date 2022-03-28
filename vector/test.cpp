@@ -10,7 +10,7 @@
 
 int main(){
     std::vector <float> v(10);
-    std::cout << v[6] << std::endl;
-    ft::vector<int> l(10);
-    l.resize(11);
+    std::cout << v[12] << std::endl;
+    ft::vector<int> l(1);
+    std::cout << l[3] << std::endl;
 }

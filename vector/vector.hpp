@@ -174,6 +174,48 @@ namespace ft{
             };
 
             //Элементы доступа
+
+            reference operator[](size_type i){
+                if (i > _capacity)//{
+                    // if (_size < _capacity)
+                        // return (*(first + _size + 1));
+                // }
+                return (*(first + i));
+            };
+
+            const_reference operator[](size_type i) const {
+                return (*(first + i));
+            };
+
+            reference at(size_type i){
+                if (i > _capacity){
+                    throw std::out_of_range("index out of range");
+                }
+                return (*(first + i));
+            };
+
+            const_reference at(size_type i) const{
+                if (i > _capacity){
+                    throw std::out_of_range("index out of range");
+                }
+                return (*(first + i));
+            };
+
+		    reference front(){
+	    		return(*first);
+		    };
+		
+		    const_reference front() const{
+			    return(*first);
+		    };
+		
+		    reference back(){
+			    return(*(first + _size - 1));
+		    };
+		
+		    const_reference back() const{
+			    return(*(first + _size - 1));
+		    };            
     };
 }
 
