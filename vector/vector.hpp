@@ -24,23 +24,26 @@ namespace ft{
             size_type _size, _capacity; //размер и емкость
             allocator_type allocator; //обьект для выделения памяти
         public:
+//||-------------------------------------"copleted, constructors"-------------------------------------||
             //default constructor w/o args
             explicit vector(const allocator_type& alloc = allocator_type()) : first(0), _size(0), _capacity(0), allocator(alloc){
             
             };
-
+// добавить конструктор вектора с помощью двух итераторов которые указывают на начало и конец вектора(любой элемент)
             //fill our vector
             explicit vector(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _size(n), _capacity(n), allocator(alloc){
                 first = allocator.allocate(n);
                 for(size_type i = 0; i < n; i++)
                     allocator.construct(first + i, val); //заполняем каждый элемент вектора дефолтным значением.(0, "")
             };
-
-            //copy constructor
+//copy constructor
             vector(const vector& right):_size(0), _capacity(0) {
                 (*this) = right;
             };
-            //destructor
+// добавить конструктор, который будет принимать на вход ренж итераторов
+//||-------------------------------------"end scope, constructors"-------------------------------------||
+            
+//||-------------------------------------"copleted, destructor"-------------------------------------||
             //сначала мы разрушаем каждый обьект который храниться в выделенной нами памяти
             //Освобождает блок памяти, ранее выделенный с помощью allocate и еще не освобожденный.
             //Элементы в массиве не уничтожаются вызовом функции deallocate, поэтому сначала destroy()
@@ -51,6 +54,8 @@ namespace ft{
                 if (_capacity != 0)
                     allocator.deallocate(first, _capacity);
             };
+//||-------------------------------------"end scope, destructors"-------------------------------------||
+//||-------------------------------------"copleted, operator="-------------------------------------||
             //перегрузка оператора присваивания
             vector& operator=(const vector& right){
                 if (this == &right)
@@ -68,9 +73,8 @@ namespace ft{
                     this->allocator.construct(first + i, right[i]);
                 return (*this);
             }
-
-            // добавить конструктор вектора с помощью двух итераторов которые указывают на начало и конец вектора(любой элемент)
-
+//||-------------------------------------"end scope, operator="-------------------------------------||
+//||-------------------------------------"copleted, but iterators didn't added"-------------------------------------||
             //Iterator
             // iterator begin(){ //итератор на первый элемент
             //     return (iterator(first));
@@ -103,8 +107,9 @@ namespace ft{
             // const_reverse_iterator rend(){//конст итератор на начало
             //     return (const_reverse_iterator(begin()));
             // };
-
+//||-------------------------------------"end scope"-------------------------------------||
             // work with capacity, size, resize and etc.
+//||------------------------------"completed, work with capacity"-------------------------------||
 
             size_type size() const{
                 return (this->_size);
@@ -172,53 +177,47 @@ namespace ft{
                 std::cout << this->_size << " <- new size" << std::endl;
                 std::cout << this->_capacity << " <- new capacity" << std::endl;
             };
-
-            //Элементы доступа
-
+//||------------------------------"end scope, work with capacity"-------------------------------||
+//||------------------------------"completed, elements access"----------------------------------||
+            //Элементы доступа без защиты
             reference operator[](size_type i){
-                // if (i > _capacity)//{
-                    // if (_size < _capacity)
-                        // return (*(first + _size + 1));
-                // }
                 return (*(first + i));
             };
-
             const_reference operator[](size_type i) const {
                 return (*(first + i));
             };
-
+            //Элементы доступа с защитой 
             reference at(size_type i){
                 if (i > _capacity){
                     throw std::out_of_range("index out of range");
                 }
                 return (*(first + i));
             };
-
             const_reference at(size_type i) const{
                 if (i > _capacity){
                     throw std::out_of_range("index out of range");
                 }
                 return (*(first + i));
             };
-
+            //возвращают ссылку на первый элемент вектора
 		    reference front(){
 	    		return(*first);
 		    };
-		
 		    const_reference front() const{
 			    return(*first);
 		    };
-		
+            //возращает ссылку на последний элемент вектора
 		    reference back(){
 			    return(*(first + _size - 1));
 		    };
-		
 		    const_reference back() const{
 			    return(*(first + _size - 1));
-		    };            
+		    };
+//||-------------------------------------"end scope"-------------------------------------||
     };
 }
 
+//||-------------------------------------"completed"-------------------------------------||
 /// Non-member function overload
     typedef std::size_t size_type;
     template <typename T, typename Alloc>
@@ -251,6 +250,6 @@ namespace ft{
     void swap(ft::vector<T, Alloc>&lhs,ft::vector<T, Alloc>&rhs){
         lhs.swap(rhs);
     }
-
+//||-------------------------------------"end scope"-------------------------------------||
 
 #endif
