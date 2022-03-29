@@ -176,7 +176,7 @@ namespace ft{
             //Элементы доступа
 
             reference operator[](size_type i){
-                if (i > _capacity)//{
+                // if (i > _capacity)//{
                     // if (_size < _capacity)
                         // return (*(first + _size + 1));
                 // }
@@ -218,5 +218,39 @@ namespace ft{
 		    };            
     };
 }
+
+/// Non-member function overload
+    typedef std::size_t size_type;
+    template <typename T, typename Alloc>
+    bool operator==(const ft::vector<T, Alloc>&lhs, const ft::vector<T, Alloc>& rhs){
+        if (lhs.size() != rhs.size())
+            return (false);
+        return (equals(lhs.begin(), lhs.end(), rhs.begin()));
+    }
+    template <typename T, typename Alloc>
+    bool operator!=(const ft::vector<T, Alloc>&lhs, const ft::vector<T, Alloc>&rhs){
+        return (!(lhs == rhs));
+    }
+    template <typename T, typename Alloc>
+    bool operator<(const ft::vector<T, Alloc>&lhs, const ft::vector<T, Alloc>&rhs){ //realize lexicgraphicCompare
+        return (lexicgraphicCompare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+    }
+    template <typename T, typename Alloc>
+    bool operator>(const ft::vector<T, Alloc>&lhs, const ft::vector<T, Alloc>&rhs){
+        return (rhs < lhs);
+    }
+    template <typename T, typename Alloc>
+    bool operator>=(const ft::vector<T, Alloc>&lhs, const ft::vector<T, Alloc>&rhs){
+        return (!(lhs < rhs));
+    }
+    template <typename T, typename Alloc>
+    bool operator<=(const ft::vector<T, Alloc>&lhs, const ft::vector<T, Alloc>&rhs){
+        return (!(lhs > rhs));
+    }
+    template <class T, class Alloc>
+    void swap(ft::vector<T, Alloc>&lhs,ft::vector<T, Alloc>&rhs){
+        lhs.swap(rhs);
+    }
+
 
 #endif
