@@ -9,8 +9,10 @@
 #include "vector.hpp"
 
 int main(){
-    std::vector <float> v(10);
+    std::vector <int> v(10);
     std::cout << v[12] << std::endl;
-    ft::vector<int> l(1);
-    std::cout << l[3] << std::endl;
+    ft::vector<int> l(700);
+    l.assign(693, 5);
+    std::cout << l[695] << std::endl;
+    std::cout << l[4] << l[5] << l[6] << std::endl;
 }

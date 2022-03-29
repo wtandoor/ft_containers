@@ -1,11 +1,14 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
+#include <iostream>
 #include <memory>
+// #include "RandomAccessIterator.hpp"
 
 namespace ft{
     template <class T, class Allocator = std::allocator<T> >
     class vector{
+        class RandomAccessIterator;
         public:
             typedef T value_type;
             typedef Allocator allocator_type;
@@ -24,7 +27,7 @@ namespace ft{
             size_type _size, _capacity; //размер и емкость
             allocator_type allocator; //обьект для выделения памяти
         public:
-//||-------------------------------------"copleted, constructors"-------------------------------------||
+//||-------------------------------------"not copleted, constructors"-------------------------------------||
             //default constructor w/o args
             explicit vector(const allocator_type& alloc = allocator_type()) : first(0), _size(0), _capacity(0), allocator(alloc){
             
@@ -55,6 +58,7 @@ namespace ft{
                     allocator.deallocate(first, _capacity);
             };
 //||-------------------------------------"end scope, destructors"-------------------------------------||
+
 //||-------------------------------------"copleted, operator="-------------------------------------||
             //перегрузка оператора присваивания
             vector& operator=(const vector& right){
@@ -74,14 +78,15 @@ namespace ft{
                 return (*this);
             }
 //||-------------------------------------"end scope, operator="-------------------------------------||
+
 //||-------------------------------------"copleted, but iterators didn't added"-------------------------------------||
-            //Iterator
+            // Iterator
             // iterator begin(){ //итератор на первый элемент
             //     return (iterator(first));
             // };
 
             // iterator end(){ // на последний 
-            //     return(iterator(first + size));
+            //     return(iterator(first + _size));
             // };
 
             // const_iterator begin() const { // конст на первый
@@ -89,7 +94,7 @@ namespace ft{
             // };
 
             // const_iterator end() const { // конст на последний 
-            //     return(const_iterator(first + size));
+            //     return(const_iterator(first + _size));
             // };
 
             // reverse_iterator rbegin(){ //итератор в обратную сторону на конец
@@ -108,6 +113,7 @@ namespace ft{
             //     return (const_reverse_iterator(begin()));
             // };
 //||-------------------------------------"end scope"-------------------------------------||
+
             // work with capacity, size, resize and etc.
 //||------------------------------"completed, work with capacity"-------------------------------||
 
@@ -178,6 +184,7 @@ namespace ft{
                 std::cout << this->_capacity << " <- new capacity" << std::endl;
             };
 //||------------------------------"end scope, work with capacity"-------------------------------||
+
 //||------------------------------"completed, elements access"----------------------------------||
             //Элементы доступа без защиты
             reference operator[](size_type i){
@@ -213,6 +220,54 @@ namespace ft{
 		    const_reference back() const{
 			    return(*(first + _size - 1));
 		    };
+//nwe
+            void swap (vector &x){
+                std::swap(first, x.first);
+                std::swap(_size, x._size);
+                std::swap(_capacity, x._capacity);
+                std::swap(allocator, x.allocator);
+            };
+
+            void clear(){
+                for(size_type i = 0; i < _size; i++){
+                    allocator.destroy(first + i);
+                }
+                _size = 0;
+            };
+
+            allocator_type getAllocator() const{
+                return (this->allocator);
+            };
+
+            void assign (size_type assign_size, const value_type &value){
+                clear();
+                if (assign_size > _capacity){
+                    allocator.deallocate(first, _capacity);
+                    first = allocator.allocate(_capacity);
+                    _capacity = assign_size;
+                }
+                for(size_type i = 0; i < assign_size; i++){
+                    allocator.construct(first + i, value);
+                }
+                _size = assign_size;
+            };
+
+            void push_back(const value_type& value){
+                if (_size == _capacity){
+                    if (_capacity == 0)
+                        reserve(1);
+                    else
+                        reserve(_capacity * 2);
+                }
+                allocator.construct(first + _size, value);
+                _size++;
+            };
+
+            void pop_back(){
+                allocator.destroy(first + _size - 1);
+                _size--;
+            };
+
 //||-------------------------------------"end scope"-------------------------------------||
     };
 }
