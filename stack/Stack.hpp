@@ -40,7 +40,6 @@ namespace ft{
                 };
 
                 value_type & top(){ //Возвращает ссылку на элемент в верхней части stack.
-                    std::cout <<  << std::endl;
                     return (_container.back());
                 };
 

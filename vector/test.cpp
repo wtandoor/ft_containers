@@ -9,10 +9,11 @@
 #include "Vector.hpp"
 
 int main(){
-    ft::vector<int> z;
-    ft::vector<int> o(1);
-    z.reserve(22);
-    std::cout << z.size() << std::endl;
+    ft::vector<int>  v(19);
+
+    std::cout << v.at(22) << std::endl;
+    std::cout << v.size() <<std::endl;
+    std::cout << v.capacity() << std::endl;
 
     // std::cout << v.size() << "  " << d.size() << "   " << a.size();
 
