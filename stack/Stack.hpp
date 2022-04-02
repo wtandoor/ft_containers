@@ -2,10 +2,10 @@
 #define STACK_HPP
 
 #include <iostream>
-#include <vector>
+#include "../vector/Vector.hpp"
 
 namespace ft{
-    template<class T, class Container = std::vector<T> > // T - тип данных для сохранения в стеке, 
+    template<class T, class Container = vector<T> > // T - тип данных для сохранения в стеке, 
                                                         //Container - тип базового контейнера 
                                                         //используемого для реализации стека, по умолчанию deque<T> 
         class stack{

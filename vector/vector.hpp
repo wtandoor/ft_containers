@@ -449,7 +449,7 @@ namespace ft{
                     for (size_t i = 0; i < _size; i++){
                         allocator.destroy(first + i);
                     }
-                    if (_size != 0)
+                    if (_size)
                         allocator.deallocate(first, _size);
                     first = newArr;
                     _size++;
@@ -465,6 +465,41 @@ namespace ft{
                 return (begin() + distance);
             };
 
+            void insert(iterator position, size_type n, const value_type& val){
+                if (n == 0)
+                    return;
+                else if (max_size() - _size < n){
+                    throw std::length_error("vector");
+                }
+                difference_type distance = position - begin();
+                if (_size + n > _capacity){
+                    size_type newCap = _capacity * 2 >= _size + n ? _capacity * 2 : _size + n;
+                    pointer newArr = allocator.allocate(newCap);
+                    std::uninitialized_copy(begin(), position, iterator(newArr));
+                    for(size_type i = 0; i < n; i++){
+                        allocator.construct(newArr + distance + i, val);
+                    }
+                    std::uninitialized_copy(position, end(), iterator(newArr + distance + n));
+                    for(size_type i = 0; i < _size; i++){
+                        allocator.destroy(first + i);
+                    }
+                    allocator.dealocate(first, _capacity);
+                    _size += n;
+                    _capacity = newCap;
+                    first = newArr;
+                }
+                else{
+                    for (size_type i = _size; i > static_cast<size_type>(distance); i--){
+                        allocator.destroy(first + i + n - 1);
+                        allocator.construct(first + i + n - 1, *(first + i - 1));
+                    }
+                    for (size_type i = 0; i < n; i++){
+                        allocator.destroy(first + i + distance);
+                        allocator.construct(first + i + distance, val);
+                    }
+                    _size += n;
+                }
+            }
 
             iterator erase(iterator _first, iterator _last) {
                 difference_type start = std::distance(begin(), _first);
