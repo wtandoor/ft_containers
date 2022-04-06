@@ -171,8 +171,8 @@ namespace ft{
                 *this = right;
             };
 // добавить конструктор, который будет принимать на вход ренж итераторов
-            template<class iterator>
-            vector(iterator input1, iterator second, const allocator_type & alloc = allocator_type(), typename enable_if<!is_integral<iterator>::value>::type* = 0): allocator(alloc){
+            template<class InputIter>
+            vector(InputIter input1, InputIter second, const allocator_type & alloc = allocator_type(), typename enable_if<!is_integral<InputIter>::value>::type* = 0): allocator(alloc){
                 if (input1 > second)
                     throw std::length_error("vector");
                 _size = second - input1;
@@ -228,8 +228,6 @@ namespace ft{
             iterator end(){ // на последний 
                 return(iterator(first + _size));
             };
-
-            
 
             const_iterator end() const { // конст на последний 
                 return(const_iterator(first + _size));
@@ -433,15 +431,53 @@ namespace ft{
                 return (begin());
             }
 
+            template<class Input>
+            void insert(iterator position, Input _first, Input last, typename enable_if<!is_integral<Input>::value>::type* = 0){
+                if (position < begin() || position > end() || _first > last)
+                    throw std::logic_error("vector");
+                size_type start = static_cast<size_type>(position - begin());
+                size_type countOfElements = static_cast<size_type>(last - _first);
+                if (_size + countOfElements > _capacity){
+                    size_type newCap = _capacity * 2 >= _size + countOfElements ? _capacity * 2 : _size + countOfElements;
+                    pointer newArr = allocator.allocate(newCap);
+                    std::uninitialized_copy(begin(), position, iterator(newArr));
+                    try{
+                        for(size_type i = 0; i < static_cast<size_type>(countOfElements); _first++)
+                            allocator.construct(newArr + start + i, *_first);
+                    }catch(...){
+                            for(size_type i = 0; i < countOfElements + start; ++i)
+                                allocator.destroy(newArr + i);
+                            allocator.deallocate(newArr, newCap);
+                            throw;
+                    }
+                    std::uninitialized_copy(position, end(), iterator(newArr + start + countOfElements));
+                    for (size_type i = 0; i < _size; i++) {
+                        allocator.destroy(first + i);
+                    }
+                    allocator.deallocate(first, _capacity);
+                    _size += countOfElements;
+                    _capacity = newCap;
+                    first = newArr;
+                } else {
+				    for (size_type i = _size; i > static_cast<size_type>(start); i--) {
+					    allocator.destroy(first + i + countOfElements - 1);
+					    allocator.construct(first + i + countOfElements - 1, *(first + i - 1));
+				    }
+				    for (size_type i = 0; i < static_cast<size_type>(countOfElements); i++, _first++) {
+					    allocator.destroy(first + i + countOfElements);
+					    allocator.construct(first + start + i, *_first);
+				    }
+				    _size += countOfElements;
+			    }
+            };
+
+            //добавление одного элемента на определенное место
             iterator insert(iterator position, const value_type& val){
                 if (position < begin() || position > end())
                     throw std::logic_error("vector");
                 difference_type distance = position - begin();
                 if (_size == _capacity){
-                    if (_capacity == 0)
-                        _capacity = 1;
-                    else
-                        _capacity *= 2;
+                    _capacity = _capacity * 2 + (_capacity == 0);
                     pointer newArr = allocator.allocate(_capacity);
                     std::uninitialized_copy(begin(), position, iterator(newArr));
                     allocator.construct(newArr + distance, val);
@@ -449,10 +485,10 @@ namespace ft{
                     for (size_t i = 0; i < _size; i++){
                         allocator.destroy(first + i);
                     }
-                    if (_size)
-                        allocator.deallocate(first, _size);
-                    first = newArr;
+                    // if (_size)
+                    allocator.deallocate(first, _size);
                     _size++;
+                    first = newArr;
                 } else {
                     for(size_type i = _size; i > static_cast<size_type>(distance); i--){
                         allocator.destroy(first + i);
@@ -464,7 +500,7 @@ namespace ft{
                 }
                 return (begin() + distance);
             };
-
+            //вставка n элементов val на определенное место
             void insert(iterator position, size_type n, const value_type& val){
                 if (n == 0)
                     return;
@@ -499,6 +535,19 @@ namespace ft{
                     }
                     _size += n;
                 }
+            }
+
+            iterator erase(iterator position){
+                // if (position > end() || position < begin())
+                //     return;
+                size_type distance = position - begin();
+                for (size_type i = distance; i < _size - 1; ++i){
+                    allocator.destroy(first + i);
+                    allocator.construct(first + i, *(first + i + 1));
+                }
+                _size--;
+                allocator.destroy(first + _size - 1);
+                return iterator(first + distance);
             }
 
             iterator erase(iterator _first, iterator _last) {
