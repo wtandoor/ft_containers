@@ -34,10 +34,35 @@ class RedBlackTree{
         size_type       _size;
 
     public:
+    //____________________________Helpers_________________________________//
+    void init_nil_head(){
+            _nil = _node_alloc.allocate(1);
+            _node_alloc.construct(_nil, Node<T>());
+            _nil->is_black = true;
+            _nil->is_nil = true;
+            _header = _node_alloc.allocate(1);
+            _node_alloc.construct(_header, Node<T>());
+            _header->value = _alloc.allocate(1);
+            _alloc.construct(_header->value, Value());
+            _header->is_black = true;
+    }
+    //____________________________Constructors_________________________________//
 
-//____________________________Constructors_________________________________//
+    RedBlackTree(const Compare &compare, const allocator_type& a = allocator_type()):
+        _alloc(a), _node_alloc(node_allocator()), _compare(compare), _root(0), _size(0){
+        init_nil_head();
+        _root = _header;
+    }
 
+    RedBlackTree() : _root(0), _alloc(allocator_type()), _node_alloc(node_allocator()),
+        _compare(value_compare()), _size(0){
+        init_nil_head();
+        _root = _header;
+    }
 
+    RedBlackTree(const RedBlackTree& other) : _compare(other._compare), _root(0){
+        *this = other;
+    }
 
         
 };
