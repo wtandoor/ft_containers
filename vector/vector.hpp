@@ -178,8 +178,8 @@ namespace ft{
                 _size = second - input1;
                 _capacity = _size;
                 first = allocator.allocate(_capacity);
-                for(difference_type i = 0; i < static_cast<difference_type>(_size);i++){
-                    allocator.construct(first + i, *(first + i));
+                for(difference_type i = 0; i < static_cast<difference_type>(_size); i++){
+                    allocator.construct(first + i, *(input1 + i));
                 }
             }
 //||-------------------------------------"end scope, constructors"-------------------------------------||
@@ -432,43 +432,51 @@ namespace ft{
             }
 
             template<class Input>
-            void insert(iterator position, Input _first, Input last, typename enable_if<!is_integral<Input>::value>::type* = 0){
-                if (position < begin() || position > end() || _first > last)
+            void insert(iterator position, Input start, Input last, typename enable_if<!is_integral<Input>::value>::type* = 0){
+                if (position < begin() || position > end() || start > last)
                     throw std::logic_error("vector");
-                size_type start = static_cast<size_type>(position - begin());
-                size_type countOfElements = static_cast<size_type>(last - _first);
-                if (_size + countOfElements > _capacity){
-                    size_type newCap = _capacity * 2 >= _size + countOfElements ? _capacity * 2 : _size + countOfElements;
-                    pointer newArr = allocator.allocate(newCap);
+                size_t distance = static_cast<size_t>(position - begin());
+                size_t countElements = static_cast<size_t>(last - start);
+                if (_size + countElements > _capacity){
+                    size_t capacity1 = _capacity * 2 >= _size + countElements ? _capacity * 2 : _size + countElements;
+                    pointer newArr = allocator.allocate(capacity1);
                     std::uninitialized_copy(begin(), position, iterator(newArr));
                     try{
-                        for(size_type i = 0; i < static_cast<size_type>(countOfElements); _first++)
-                            allocator.construct(newArr + start + i, *_first);
-                    }catch(...){
-                            for(size_type i = 0; i < countOfElements + start; ++i)
-                                allocator.destroy(newArr + i);
-                            allocator.deallocate(newArr, newCap);
-                            throw;
+                        for (size_t i = 0; i < countElements; start++, i++)
+                            allocator.construct(newArr + distance + i, *start);
+                    } catch (...){
+                        for (size_t i = 0; i < countElements + distance; ++i)
+                            allocator.destroy(newArr + i);
+                        allocator.deallocate(newArr, capacity1);
+                        throw;
                     }
-                    std::uninitialized_copy(position, end(), iterator(newArr + start + countOfElements));
-                    for (size_type i = 0; i < _size; i++) {
+                    std::uninitialized_copy(position, end(), iterator(newArr + distance + countElements));
+                    for (size_t i = 0; i < _size; i++)
                         allocator.destroy(first + i);
-                    }
                     allocator.deallocate(first, _capacity);
-                    _size += countOfElements;
-                    _capacity = newCap;
+                    _size += countElements;
+                    _capacity = capacity1;
                     first = newArr;
                 } else {
-				    for (size_type i = _size; i > static_cast<size_type>(start); i--) {
-					    allocator.destroy(first + i + countOfElements - 1);
-					    allocator.construct(first + i + countOfElements - 1, *(first + i - 1));
-				    }
-				    for (size_type i = 0; i < static_cast<size_type>(countOfElements); i++, _first++) {
-					    allocator.destroy(first + i + countOfElements);
-					    allocator.construct(first + start + i, *_first);
-				    }
-				    _size += countOfElements;
-			    }
+                    for (size_t i = _size; i > static_cast<size_t>(distance); i--){
+                        allocator.destroy(first + i + countElements - 1);
+                        allocator.construct(first + i + countElements - 1, *(first + i - 1));
+                    }
+                    for (size_t i = 0; i <static_cast<size_t>(countElements); i++, start++){
+                        allocator.destroy(first + i + countElements);
+                        allocator.construct(first + distance + i, *start);
+                    }
+                    _size += countElements;
+                }
+//				    for (size_type i = _size; i > static_cast<size_type>(start); i--) {
+//					    allocator.destroy(first + i + countOfElements - 1);
+//					    allocator.construct(first + i + countOfElements - 1, *(first + i - 1));
+//				    }
+//				    for (size_type i = 0; i < static_cast<size_type>(countOfElements); i++, _first++) {
+//					    allocator.destroy(first + i + countOfElements);
+//					    allocator.construct(first + start + i, *_first);
+//				    }
+//				    _size += countOfElements;
             };
 
             //добавление одного элемента на определенное место
@@ -477,7 +485,11 @@ namespace ft{
                     throw std::logic_error("vector");
                 difference_type distance = position - begin();
                 if (_size == _capacity){
-                    _capacity = _capacity * 2 + (_capacity == 0);
+                    if (_capacity == 0){
+                        _capacity = 1;
+                    } else {
+                        _capacity = _capacity * 2;
+                    }
                     pointer newArr = allocator.allocate(_capacity);
                     std::uninitialized_copy(begin(), position, iterator(newArr));
                     allocator.construct(newArr + distance, val);
@@ -485,12 +497,11 @@ namespace ft{
                     for (size_t i = 0; i < _size; i++){
                         allocator.destroy(first + i);
                     }
-                    // if (_size)
                     allocator.deallocate(first, _size);
                     _size++;
                     first = newArr;
                 } else {
-                    for(size_type i = _size; i > static_cast<size_type>(distance); i--){
+                    for(size_type i = _size - 1; i > static_cast<size_type>(distance); i--){
                         allocator.destroy(first + i);
                         allocator.construct(first + i, *(first + i - 1));
                     }
