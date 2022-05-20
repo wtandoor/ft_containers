@@ -104,7 +104,73 @@ namespace ft{
             return _tree.insert(hint, value);
         }
 
+        template<class InputIterator>
+        void insert(typename enable_if< !is_integral<InputIterator>::value, InputIterator >::type first, InputIterator last) {
+            _tree.insert(first, last);
+        }
 
+        void erase(iterator pos){
+            _tree.erase(pos);
+        }
+
+        size_type erase(const Key& key){
+            return _tree.erase(make_pair(key, map_type()));
+        }
+
+        void erase(iterator first, iterator last){
+            _tree.erase(first, last);
+        }
+
+        iterator find(const Key & key){
+            return _tree.find(make_pair(key, map_type()));
+        }
+
+        size_type count(const Key& key) const {
+            return _tree.count(make_pair(key, map_type()));
+        }
+
+        void swap(map & other){
+            std::swap(this->_compare, other._compare);
+            _tree.swap(other._tree);
+        }
+
+        iterator lower_bound(const key_type& key){
+            return _tree.lower_bound(make_pair(key, map_type()));
+        }
+
+        const_iterator lower_bound(const key_type& key){
+            return _tree.lower_bound(make_pair(key, map_type()));
+        }
+
+        iterator upper_bound(const key_type& key){
+            return _tree.upper_bound(make_pair(key, map_type()));
+        }
+
+        const_iterator upper_bound(const key_type& key){
+            return _tree.upper_bound(make_pair(key, map_type()));
+        }
+
+        pair<iterator, iterator> equal_range(const key_type& key){
+            return _tree.equal_range(make_pair(key, map_type()));
+        }
+
+        pair<const_iterator, const_iterator> equal_range(const key_type& key){
+            return _tree.equal_range(make_pair(key, map_type()));
+        }
+
+        T& at(const Key& key){
+            iterator res = _tree.find(ft::make_pair(key, map_type()));
+            if (res == _tree.end()){
+                throw std::std::out_of_range("map::at: key not found");
+            }
+            return res->second;
+        }
+
+        template<class _Key, class _T, class _Compare, class _Alloc>
+        friend bool operator==(const map<_Key, _T, _Compare, _Alloc>& lhs, const map<_Key, _T, _Compare, _Alloc>& rhs);
+
+        template<class _Key, class _T, class _Compare, class _Alloc>
+        friend bool operator<(const map<_Key, _T, _Compare, _Alloc>& lhs, const map<_Key, _T, _Compare, _Alloc>& rhs);
     };
 }
 
