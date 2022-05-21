@@ -5,7 +5,7 @@
 #include "../utility/utility.hpp"
 
 namespace ft{
-    template <class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<pair<const Key, T>>
+    template <class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<pair<const Key, T>>>
     class map{
     public:
         typedef Key                                                 key_type;
@@ -172,7 +172,42 @@ namespace ft{
         template<class _Key, class _T, class _Compare, class _Alloc>
         friend bool operator<(const map<_Key, _T, _Compare, _Alloc>& lhs, const map<_Key, _T, _Compare, _Alloc>& rhs);
     };
-}
+
+    template<class Key, class T, class Compare, class Alloc>
+    bool operator==(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs){
+        return (lhs._tree == rhs._tree);
+    }
+
+    template<class Key, class T, class Compare, class Alloc>
+    bool operator!=(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs){
+        return !(lhs == rhs);
+    }
+
+    template<class Key, class T, class Compare, class Alloc>
+    bool operator<(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs){
+        return (lhs._tree < rhs._tree);
+    }
+
+    template<class Key, class T, class Compare, class Alloc>
+    bool operator>(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs){
+        return (rhs < lhs);
+    }
+
+    template<class Key, class T, class Compare, class Alloc>
+    bool operator<=(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs){
+        return !(lhs > rhs);
+    }
+
+    template<class Key, class T, class Compare, class Alloc>
+    bool operator>=(const map<Key, T, Compare, Alloc> & lhs, const map<Key, T, Compare, Alloc> & rhs){
+        return !(lhs < rhs);
+    }
+
+    template<class Key, class T, class Compare, class Alloc>
+    void swap(const map<Key, T, Compare, Alloc>& lhs, const map<Key, T, Compare, Alloc>& rhs){
+        lhs.swap(rhs);
+    }
+};
 
 
 #endif
