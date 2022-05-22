@@ -9,16 +9,6 @@ public:
     bool is_black;
     bool is_nil;
 
-
-
-
-
-
-
-
-
-
-
     Node (Value *value = 0) : _value(value), _parent(0), _left(0), _right(0), is_black(false), is_nil(false) {}
 
     Node(Node const& other){
@@ -107,5 +97,59 @@ public:
 
     TreeIterator& operator++(int){
         TreeIterator<value_type> temp = *this;
+        if (_node->_right != NULL && !_node->_right->is_nil)
+            _node = tree_min(_node->_right);
+        else {
+            node_pointer n = _node->_parent;
+            while (n != NULL && _node == n->_right) {
+                _node = n;
+                n = n->_parent;
+            }
+            _node = n;
+        }
+        return temp;
+    }
+
+    TreeIterator& operator--(){
+        if (_node->_left && !_node->_left->is_nil)
+            _node = tree_max(_node->_left);
+        else {
+            node_pointer n = _node->_parent;
+            while (n != NULL && _node == n->_left) {
+                _node = n;
+                n = n->_parent;
+            }
+            _node = n;
+        }
+        return *this;
+    }
+
+    TreeIterator& operator--(int){
+        TreeIterator<value_type> temp = *this;
+        if (_node->_left && !_node->_left->is_nil)
+            _node = tree_max(_node->_left);
+        else {
+            node_pointer n = _node->_parent;
+            while (n != NULL && _node == n->_left) {
+                _node = n;
+                n = n->_parent;
+            }
+            _node = n;
+        }
+        return temp;
+    }
+
+    node_pointer node() const {
+        return _node;
     }
 };
+
+template <typename A, typename B>
+bool operator==(const TreeIterator<A>& lhs, const TreeIterator<B>& rhs){
+    return lhs.node() == rhs.node();
+}
+
+template <typename A, typename B>
+bool operator!=(const TreeIterator<A>& lhs, const TreeIterator<B>& rhs){
+    return lhs.node() != rhs.node();
+}
