@@ -6,13 +6,13 @@
 #include "tree_iterator.hpp"
 #include "../utility/utility.hpp"
 
-template<class T, class Compare = std::less<T>, class Alloc = std::allocator<T> >
+template<class Value, class Compare = std::less<Value>, class Alloc = std::allocator<Value> >
 class RedBlackTree{
     public:
-        typedef T                                                   value_type;
+        typedef Value                                                   value_type;
         typedef Compare                                             value_compare;
         typedef Alloc                                               allocator_type;
-        typedef typename Alloc::template rebind<Node<T> >::other    node_allocator;
+        typedef typename Alloc::template rebind<Node<Value> >::other    node_allocator;
         typedef typename node_allocator::pointer                    node_pointer;
         typedef typename allocator_type::reference                  reference;
         typedef typename allocator_type::const_reference            const_reference;
@@ -20,8 +20,8 @@ class RedBlackTree{
         typedef typename allocator_type::const_pointer              const_pointer;
         typedef std::ptrdiff_t                                      difference_type;
         typedef std::size_t                                         size_type;
-        typedef TreeIterator<T>                                         iterator;
-        typedef TreeIterator<const T>                                   const_iterator;
+        typedef TreeIterator<Value>                                         iterator;
+        typedef TreeIterator<const Value>                                   const_iterator;
         typedef ft::reverse_iterator<iterator>                      reverse_iterator;
         typedef ft::reverse_iterator<const_iterator>                const_reverse_iterator;
 
@@ -36,13 +36,86 @@ class RedBlackTree{
 
     public:
     //____________________________Helpers_________________________________//
+    node_pointer tree_min(node_pointer n) const{
+        while (n != NULL && !is_nil(n->_left))
+            n = n->_left;
+        return n;
+    }
+
+    node_pointer tree_max(node_pointer n) const{
+        while (n != NULL && is_nil(n->_right)) {
+            n = n->_right;
+        }
+        return n;
+    }
+
+    void _rotate_right(node_pointer node){
+        node_pointer n;
+
+        n = node->_left;
+        node->_left = n->_right;
+        if (!is_nil(n->_right))
+            n->_right->_parent = node;
+        n->_parent = node->_parent;
+        if (node->_parent == NULL)
+            _root = n;
+        else if (node == node->_parent->_left)
+            node->_parent->_left = n;
+        else
+            node->_parent->_right = n;
+        n->_right = node;
+        node->_parent = n;
+    }
+
+    void _rotate_left(node_pointer node){
+        node_pointer n;
+
+        n = node->_right;
+        node->_right = n->_left;
+        if (!is_nil(n->_left))
+            n->_left->_parent = node;
+        n->_parent = node->_parent;
+        if (node->_parent == NULL)
+            _root = n;
+        else if (node == node->_parent->_left)
+            node->_parent->_left = n;
+        else
+            node->_parent->_right = n;
+        n->_left = node;
+        node->_parent = n;
+    }
+
+    node_pointer _insert(node_pointer new_node){
+        if (_root == _header)
+            _root = new_node;
+        else
+            _insert_to_node(_root, new_node);
+        return new_node;
+    }
+
+    node_pointer _insert_to_node(node_pointer root, node_pointer new_node){
+        if (_compare(*new_node->_value, *root->_value)){
+            if (!is_nil(_root->_left))
+                return _insert_to_node(_root->_left, new_node);
+            _root->_left = new_node;
+        } else {
+            if (!is_nil(_root->_right))
+                return _insert_to_node(_root->_right, new_node)
+            _root->_right = new_node;
+        }
+        new_node->_parent = _root;
+        return new_node;
+    }
+
+    
+
     void init_nil_head(){
             _nil = _node_alloc.allocate(1);
-            _node_alloc.construct(_nil, Node<T>());
+            _node_alloc.construct(_nil, Node<Value>());
             _nil->is_black = true;
             _nil->is_nil = true;
             _header = _node_alloc.allocate(1);
-            _node_alloc.construct(_header, Node<T>());
+            _node_alloc.construct(_header, Node<Value>());
             _header->value = _alloc.allocate(1);
             _alloc.construct(_header->value, Value());
             _header->is_black = true;
@@ -84,6 +157,40 @@ class RedBlackTree{
         _alloc.construct(new_val, value);
         return new_val;
     }
+
+    void copy_node(node_pointer other){
+        node_pointer new_node = _node_alloc.allocate(1);
+        _node_alloc.construct(new_node, Node<Value>());
+        new_node->is_black = other->is_black;
+        new_node->is_nil = other->is_nil;
+        if (other->_value){
+            new_node->_value = _alloc.allocate(1);
+            _alloc.construct(new_node->_value, *other->_value);
+        }
+        return new_node;
+    }
+
+    void copy_child(node_pointer my_node, node_pointer other){
+        if (other->_left->is_nil)
+            my_node->_left = _nil;
+        else {
+            my_node->_left = copy_node(other->_left);
+            my_node->_left->_parent = my_node;
+            copy_child(my_node->_left, other->_left);
+        }
+        if (other->_right->is_nil)
+            my_node->_right = _nil;
+        else if (other->_right->_right == NULL){
+            my_node->_right = _header;
+            _header->_parent = my_node;
+        } else {
+            my_node->_right = copy_node(other->_right);
+            my_node->_right->_parent = my_node;
+            copy_child(my_node->_right, other->_right);
+        }
+    }
+
+
 
     //____________________________Constructors_________________________________//
 
