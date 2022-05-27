@@ -107,7 +107,84 @@ class RedBlackTree{
         return new_node;
     }
 
-    
+    node_pointer _insert_into_tree(node_pointer new_node, node_pointer position){
+        if (_root = _header)
+            _root  = new_node;
+        else
+            _insert_to_node(position, new_node);
+        return new_node;
+    }
+
+    void _insert_fixup(node_pointer node){
+        if (node != _root && node->_parent != _root) {
+            while (node != _root && !node->_parent->is_black) {
+                if (node->_parent == node->_parent->_parent->_left){
+                    node_pointer uncle = node->_parent->_parent->_right;
+                    if (!uncle->is_black){
+                        node->_parent->is_black = true;
+                        uncle->is_black = true;
+                        node->_parent->_parent->is_black = false;
+                        node = node->_parent->_parent;
+                    } else {
+                        if (node == node->_parent->_right){
+                            node = node->_parent;
+                            _rotate_left(node);
+                        }
+                        node->_parent->is_black = true;
+                        node->_parent->_parent->is_black = false;
+                        _rotate_right(node->_parent->_parent);
+                    }
+                } else {
+                    node_pointer uncle = node->_parent->_parent->_left;
+                    if (!uncle->is_black) {
+                        node->_parent->is_black = true;
+                        uncle->is_black = true;
+                        node->_parent->_parent->is_black = false;
+                        node = node->_parent->_parent;
+                    } else {
+                        if (node == node->_parent->_left) {
+                            node = node->_parent;
+                            _rotate_right(node);
+                        }
+                        node->_parent->is_black = true;
+                        node->_parent->_parent->is_black = false;
+                        _rotate_left(node->_parent->_parent);
+                    }
+                }
+            }
+        }
+        _root->is_black = true;
+    }
+
+    bool is_nil(node_pointer node) const {
+        return node == _nil || node == _header;
+    }
+
+    void clear_node(node_pointer node){
+        if (node && !is_nil(node)) {
+            clear_node(node->_right);
+            clear_node(node->_left);
+            _alloc.destroy(node->_value);
+            _alloc.deallocate(node->_value, 1);
+            _node_alloc.deallocate(node, 1);
+        }
+    }
+
+    void transplant(node_pointer position, node_pointer node){
+        if (position == _root){
+            _root = node;
+        } else if (position == position->_parent->_left) {
+            position->_parent->_left = node;
+        } else 
+            position->_parent->_right = node;
+        node->_parent = position->_parent;
+    }
+
+    void free_node(node_pointer node){
+        _alloc.destroy(node->_value);
+        _alloc.deallocate(node->_value, 1);
+        _node_alloc.deallocate(node, 1);
+    }
 
     void init_nil_head(){
             _nil = _node_alloc.allocate(1);
@@ -188,7 +265,8 @@ class RedBlackTree{
             my_node->_right->_parent = my_node;
             copy_child(my_node->_right, other->_right);
         }
-    }
+    }//search , find, pair, inserts, erases, 
+
 
 
 
