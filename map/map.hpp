@@ -5,7 +5,7 @@
 #include "../utility/utility.hpp"
 
 namespace ft{
-    template <class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<pair<const Key, T>>>
+    template <class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<pair<const Key, T> > >
     class map{
     public:
         typedef Key                                                 key_type;
@@ -20,12 +20,15 @@ namespace ft{
         typedef typename allocator_type::const_pointer              const_pointer;
 
     private:
-        class pair_compare{
-            key_compare _compare;
-        public:
-            pair_compare(const key_compare & compare) : _compare(compare){}
-            bool operator()(const value_type& x, const value_type& y) const {return (_compare(x.first, y.first))}
-        };
+            class pair_compare {
+                    key_compare _compare;
+                public:
+                pair_compare(const key_compare & compare) : _compare(compare){}
+
+                bool operator()(const value_type& x, const value_type& y) const {
+                    return (_compare(x.first, y.first));
+                }
+            };
 
     public:
         typedef pair_compare value_compare;
@@ -42,7 +45,7 @@ namespace ft{
 
     public:
         explicit map(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) :
-            _allocator(alloc), _tree(comp, alloc), _compare(comp) {}
+            _allocator(alloc), _tree(tree_type(comp, alloc)), _compare(comp) {}
 
         template< class InputIterator >
         map(InputIterator first, InputIterator last, const Compare& compare = Compare(), const Allocator& alloc = Allocator()) :
@@ -57,7 +60,7 @@ namespace ft{
         }
 
         size_type size() const {
-            return (_tree.get_size());
+            return (_tree.size());
         }
 
         size_type max_size() const {
@@ -73,7 +76,7 @@ namespace ft{
         }
 
         key_compare key_comp() const {
-            return _tree.key_comp();
+            return _compare;
         }
 
         iterator begin(){
@@ -138,7 +141,7 @@ namespace ft{
             return _tree.lower_bound(make_pair(key, map_type()));
         }
 
-        const_iterator lower_bound(const key_type& key){
+        const_iterator lower_bound(const key_type& key) const {
             return _tree.lower_bound(make_pair(key, map_type()));
         }
 
@@ -146,7 +149,7 @@ namespace ft{
             return _tree.upper_bound(make_pair(key, map_type()));
         }
 
-        const_iterator upper_bound(const key_type& key){
+        const_iterator upper_bound(const key_type& key) const {
             return _tree.upper_bound(make_pair(key, map_type()));
         }
 
@@ -154,14 +157,14 @@ namespace ft{
             return _tree.equal_range(make_pair(key, map_type()));
         }
 
-        pair<const_iterator, const_iterator> equal_range(const key_type& key){
+        pair<const_iterator, const_iterator> equal_range(const key_type& key) const {
             return _tree.equal_range(make_pair(key, map_type()));
         }
 
         T& at(const Key& key){
             iterator res = _tree.find(ft::make_pair(key, map_type()));
             if (res == _tree.end()){
-                throw std::std::out_of_range("map::at: key not found");
+                throw std::out_of_range("map::at: key not found");
             }
             return res->second;
         }

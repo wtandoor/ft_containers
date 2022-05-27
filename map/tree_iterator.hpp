@@ -2,6 +2,8 @@
 template <class Value>
 struct Node {
 public:
+    explicit Node (Value *value = 0) : _value(value), _parent(0), _left(0), _right(0), is_black(false), is_nil(false) {}
+    
     Value *_value;
     Node *_parent;
     Node *_left;
@@ -9,18 +11,16 @@ public:
     bool is_black;
     bool is_nil;
 
-    Node (Value *value = 0) : _value(value), _parent(0), _left(0), _right(0), is_black(false), is_nil(false) {}
-
-    Node(Node const& other){
+    Node(const Node& other){
         _value = other._value;
         _parent = other._parent;
         _left = other._left;
         _right = other._right;
         is_black = other.is_black;
         is_nil = other.is_nil;
-    }
+    };
 
-    Node & operator=(Node const& other){
+    Node & operator=(const Node & other){
         _value = other._value;
         _parent = other._parent;
         _left = other._left;
@@ -28,7 +28,7 @@ public:
         is_black = other.is_black;
         is_nil = other.is_nil;
         return *this;
-    }
+    };
 
     virtual ~Node(){}
 };
@@ -53,7 +53,7 @@ private:
         return n;
     }
     node_pointer tree_max(node_pointer n) const {
-        while (n->_right != NULL && !n->_right->is_nill) {
+        while (n->_right != NULL && !n->_right->is_nil) {
             n = n->_right;
         }
         return n;
@@ -95,7 +95,7 @@ public:
         return *this;
     }
 
-    TreeIterator& operator++(int){
+    TreeIterator operator++(int){
         TreeIterator<value_type> temp = *this;
         if (_node->_right != NULL && !_node->_right->is_nil)
             _node = tree_min(_node->_right);
@@ -124,7 +124,7 @@ public:
         return *this;
     }
 
-    TreeIterator& operator--(int){
+    TreeIterator operator--(int){
         TreeIterator<value_type> temp = *this;
         if (_node->_left && !_node->_left->is_nil)
             _node = tree_max(_node->_left);
