@@ -468,15 +468,6 @@ namespace ft{
                     }
                     _size += countElements;
                 }
-//				    for (size_type i = _size; i > static_cast<size_type>(start); i--) {
-//					    allocator.destroy(first + i + countOfElements - 1);
-//					    allocator.construct(first + i + countOfElements - 1, *(first + i - 1));
-//				    }
-//				    for (size_type i = 0; i < static_cast<size_type>(countOfElements); i++, _first++) {
-//					    allocator.destroy(first + i + countOfElements);
-//					    allocator.construct(first + start + i, *_first);
-//				    }
-//				    _size += countOfElements;
             };
 
             //добавление одного элемента на определенное место
@@ -530,7 +521,7 @@ namespace ft{
                     for(size_type i = 0; i < _size; i++){
                         allocator.destroy(first + i);
                     }
-                    allocator.dealocate(first, _capacity);
+                    allocator.deallocate(first, _capacity);
                     _size += n;
                     _capacity = newCap;
                     first = newArr;
